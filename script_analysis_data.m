@@ -4,11 +4,9 @@ close all
 
 %% Main code to estimate the kinetic parameters of the BCM and the SCM.
 
-%% TODO: chiedere a Michele se possiamo darli o è meglio ribadire che sono 
-%% disponibili su richiesta.
-
 %% Define data path 
-path_data = './data';
+path_data = './data'; 
+   % Data are available upon request to prof Gianmario Sambuceti (Sambuceti at unige.it).
 path_functions = './func';
 addpath(path_functions)
 
@@ -21,7 +19,7 @@ mice_CT26 = {'#0 CT26 NO STS 2012.11.13 PRIMA PET';...
 
 %% Initialization
 % Number of repetition of the algorithm
-tent = 1; 
+tent = 50; 
 
 % SCM
 k1_Skf_vec = zeros(tent,1); k2_Skf_vec = zeros(tent,1);
@@ -88,9 +86,19 @@ for n=1:tent
     
     disp(['n = ',num2str(n)]); 
     
+    % Initialize kinetic parameters
+    k1x = rand(1);
+    k2x = rand(1);
+    k3x = rand(1);
+    k5x = 1;
+    while k5x > norm(K_Skf.mean)
+        k5x = rand(1);
+    end
+    k6x = 0;
+    
     [k1_BCM_vec(n),k2_BCM_vec(n),k3_BCM_vec(n),k5_BCM_vec(n),k6_BCM_vec(n),...
         Cx_BCM_vec{n},Cxdata_BCM,relerr_BCM_vec(n),iter_BCM_vec(n)] = ...
-        reconstruction_BCM(Ct,Ca,t,0,[0;0;0]);
+        reconstruction_BCM(Ct,Ca,t,0,[0;0;0], k1x, k2x, k3x, k5x, k6x);
 
 end
 

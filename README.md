@@ -11,4 +11,4 @@ The code allows to reproduce the results shown in
 Code is written in Matlab R2015b and tested with versions up to R2019b.
 The experimental data used in the paper are available upon request to prof Gianmario Sambuceti (Sambuceti at unige.it).
 
-run script_fig_\*.m to reproduce the figures of the paper. run script_analysis_data to analyse the data. 
+run script_fig_\*.m to reproduce the figures of the paper. run script_analysis_data.m to analyse the data. 

@@ -14,7 +14,7 @@ dark_green = [0 0.8 0];
 path_results = './results/';
 path_figures = './figures/';
 
-load(fullfile(path_results, 'K_#0 CT26 NO STS 2012.11.13 PRIMA PET.mat'));
+load(fullfile(path_results, 'K_m1.mat'));
 Ca_minus = Ca(t) - 2*sqrt(Ca(t)); err_Ca = abs(Ca(t) - Ca_minus);
 Ct_minus = Ct - sqrt(Ct); err_Ct = abs(Ct - Ct_minus);
 

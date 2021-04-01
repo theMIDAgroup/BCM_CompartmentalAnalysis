@@ -1,4 +1,5 @@
-function [k1x,k2x,k3x,k5x,k6x,Cx,Cxdata,relerr,iter] = reconstruction_BCM(Cdata,Ca,t,t0,C0,k1,k2,k3,k5,k6) 
+function [k1x,k2x,k3x,k5x,k6x,Cx,Cxdata,relerr,iter] = ...
+    reconstruction_BCM(Cdata,Ca,t,t0,C0,k1,k2,k3,k5,k6, varargin)
 
 % blood volume fraction (tumor)
 Vb = 0.15;
@@ -7,14 +8,19 @@ Vi = 0.3;
 
 % v=V_er/V_cyt ratio of the intracellular volumes of ER and cytosol
 % Vr=V_er/(V_er+V_cyt)=v/(1+v)
-v = 0.17;
+if numel(varargin)==0
+    v = 0.17;
+else
+    v = varargin{1};
+end
+
 Vr = v/(1+v);
 
 % To sum the compartment concentrations
 alpha = [Vi+(1-Vr)*(1-Vb-Vi),(1-Vr)*(1-Vb-Vi),Vr*(1-Vb-Vi)];
 
 % Initialization of kinetic parameters
-switch nargin
+switch nargin - numel(varargin)
     case 5 % real data
         k1x = rand(1);
         k2x = rand(1);
@@ -64,7 +70,7 @@ while relerr>toll
     
     % Regularization parameter --------------------------------------------
     % values for lambda to compute V_lambda
-    switch nargin
+    switch nargin - numel(varargin)
         case 5 % real data
             vect_lambda = 5e4:5e4:5e6;
         case 10 % simulation
@@ -124,7 +130,7 @@ while relerr>toll
         else
             
             % Initialization of kinetic parameters
-            switch nargin
+            switch  nargin - numel(varargin)
                 case 5 % real data
                     k1x = rand(1);
                     k2x = rand(1);

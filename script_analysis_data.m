@@ -6,18 +6,14 @@ close all
 
 %% Define data path 
 path_data = './data'; 
-   % Data are available upon request to prof Gianmario Sambuceti (Sambuceti at unige.it).
 path_functions = './func';
 addpath(path_functions)
-
-mice_CT26 = {'#0 CT26 NO STS 2012.11.13 PRIMA PET';...
-    '#1 CT26 NO STS 2012.11.13 PRIMA PET';...
-    '#2 CT26 NO STS 2012.11.13 PRIMA PET';...
-    '#4 CT26 NO STS 2012.11.14 PRIMA PET';...
-    '#1 CT26 NO STS 2012.11.20 SECONDA PET';...
-    '#3 CT26 NO STS 2012.11.21 SECONDA PET'};
+path_results = './results';
 
 %% Initialization
+% Number of mice
+n_mice = 6;
+
 % Number of repetition of the algorithm
 tent = 50; 
 
@@ -34,24 +30,14 @@ relerr_BCM_vec = zeros(tent,1); iter_BCM_vec = zeros(tent,1);
 Cx_BCM_vec = cell(tent,1);
 
 %% for each mouse
-for i=1:length(mice_CT26)
+for i=1:n_mice
 
-disp(' '); disp(['mouse = ',mice_CT26{i}]); 
-mouse = mice_CT26{i};
+fprintf(' Working with mouse m%d ', i)
 
 % Load data
-if i <= 4
-    folder = strcat('/PRIMA PET/',mouse,'/');
-else
-    folder = strcat('/SECONDA PET/',mouse,'/');
-end  
-[t,Ca,Ct] = import_voistat(path_data,folder);
-    
-% Correct data
-if i == 1 || i == 3
-    Ca(21) = (Ca(20)+Ca(22))/2;
-    Ct(21) = (Ct(20)+Ct(22))/2;
-end
+load(fullfile(path_data, sprintf('data_m%d', i)))
+t = data.t; Ca = data.Ca; Ct = data.Ct; clear data
+
 t = t'; Ca = @(tt)(interp1([0 t],[0 Ca'],tt,'linear',0));
     
 %% SCM
@@ -117,7 +103,8 @@ K_BCM.relerr = relerr_BCM_vec; K_BCM.iter = iter_BCM_vec; K_BCM.comp = Cx_BCM_ve
 K_BCM.mean = Km_BCM; K_BCM.std = Kstd_BCM; K_BCM.comp_mean = Cxm_BCM;
 
 %% Save
-save(strcat('K_',mouse,'.mat'),'mouse','t','Ca','Ct','K_Skf','K_BCM');
+save(fullfile(path_results, sprintf('K_m%d.mat', i)), ...
+            't','Ca','Ct','K_Skf','K_BCM');
 
 end
 

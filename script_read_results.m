@@ -2,24 +2,16 @@ clc
 clear 
 close all
 
-path_results = '.';
+path_results = './results';
 
-mice_CT26 = {'#0 CT26 NO STS 2012.11.13 PRIMA PET';...
-    '#1 CT26 NO STS 2012.11.13 PRIMA PET';...
-    '#2 CT26 NO STS 2012.11.13 PRIMA PET';...
-    '#4 CT26 NO STS 2012.11.14 PRIMA PET';...
-    '#1 CT26 NO STS 2012.11.20 SECONDA PET';...
-    '#3 CT26 NO STS 2012.11.21 SECONDA PET'};
-
-n_mice = numel(mice_CT26);
+n_mice =6;
 
 k_name_bcm = {'k1', 'k2', 'k3', 'k5', 'k6'};
 k_name_scm = {'k1', 'k2', 'k3', 'k4'};
 
 for im = 1:n_mice
     
-    mouse = mice_CT26{im};
-    file_result = fullfile(path_results, strcat('K_',mouse,'.mat'));
+    file_result = fullfile(path_results, sprintf('K_m%d.mat', im));
     load(file_result)
     
     fprintf('******* MOUSE m%d *******  \n', im)

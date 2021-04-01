@@ -2,6 +2,7 @@ clc
 clear
 close all
 
+%% Set path and general parameters
 set(0,'DefaultAxesFontSize',25)
 set(0, 'defaultAxesTickLabelInterpreter','latex'); 
 set(0, 'defaultLegendInterpreter','latex');
@@ -10,253 +11,165 @@ path_figures = './figures';
 path_functions = './func';
 addpath(path_functions)
 
-%% Define model parameters
+path_data = './data';
+
+%% Define model parameters and load data
 Vb = 0.15; % blood volume fraction (tumor)
 Vi = 0.3; % interstizial volume fraction (tumor)
-v = 0.17; % total volume of the enoplasmatic reticulum
-Vr = v/(1+v); 
+v = 0.17; % total volume of the endoplasmatic reticulum
+Vr = v/(1+v);
 
 alpha = [Vi+(1-Vr)*(1-Vb-Vi), (1-Vr)*(1-Vb-Vi), Vr*(1-Vb-Vi)];
-
-% Acquisition time
-time = [7.5 22.50262 37.50008 52.50036 67.50043 82.50053 97.50076 ...
-    112.5008 127.501005 142.501 165.0011 195.0016 225.0018 255.002 ...
-    285.0021 334.1693 394.1695 454.1707 514.171015 574.1711 685.1639 ...
-    835.1641 1065.2923 1370.788 1675.5025 1980.81945 2285.738];
-t = (time./60)';
-ntime = length(t);
-
-% simulated Input Function
-Ca = @(tt)(6.6991e+06*(tt.^5.4135e+00).*exp(-tt/9.65e-02)+3.611738e+02*exp(-tt/2.85452e+01)).';
-
-%% Sensitivity analysis (one kinetic parameter at the time)
-range = [0.1, 0.5, 1, 2, 10, 20, 100];
-
-%% k1
-k1_vec = 0.3*range;
-k2 = 0.4;
-k3 = 0.6;
-k5= 0.6;
-k6 = 0.06;
-
-Cxdata = zeros(length(t),length(k1_vec));
-for i = 1:length(k1_vec)
-    k1 = k1_vec(i);
-    Mx = [[-(k2+k3);k3;0],[0;-k5;k5],[k6;0;-k6]];
-    Cx = concentration(k1,Mx,Ca,0,[0;0;0],t);
-    Cxdata(:,i) = (alpha*Cx + Vb*Ca(t))';
-end
-
-figure('units','normalized','outerposition',[0 0 0.7 0.7]);
-set(gcf,'Color','none');
-hold on;
-axis square;% grid on;
-for i = 1:length(k1_vec)    
-    if range(i) == 1
-        plot(t,Cxdata(:,i), '-x', 'Markersize', 10, 'LineWidth', 3.5, ...
-            'Displayname', strcat(['k1 = ', num2str(k1_vec(i))]));
-    else
-    plot(t,Cxdata(:,i), 'LineWidth', 3.5, 'Displayname', strcat(['k1 = ', num2str(k1_vec(i))]));   
-    end
-end
-set(gca,'xtick',0:10:40); 
-xlabel('time [min]','FontSize',30,'Interpreter','Latex'); 
-ylabel('concentration $C_T$ [kBq/mL]','FontSize',30,'Interpreter','Latex');
-legend('show', 'Location','northeastoutside')
-ylim([0, 500])
-ax = gca;
-ax.XAxis.LineWidth = 2;
-ax.YAxis.LineWidth = 2;
-
-fig = gcf; fig.PaperPositionMode = 'auto';
-print(fullfile(path_figures, 'sensitivity_k1'),'-dpng','-r300')
-
-%% k2
-k1 = 0.3;
-k2_vec = 0.4*range;
-k3 = 0.6;
-k5= 0.6;
-k6 = 0.06;
-
-Cxdata = zeros(length(t),length(k2_vec));
-for i = 1:length(k2_vec)
-    k2 = k2_vec(i);
-    Mx = [[-(k2+k3);k3;0],[0;-k5;k5],[k6;0;-k6]];
-    Cx = concentration(k1,Mx,Ca,0,[0;0;0],t);
-    Cxdata(:,i) = (alpha*Cx + Vb*Ca(t))';
-end
-
-figure('units','normalized','outerposition',[0 0 0.7 0.7]);
-set(gcf,'Color','none');
-hold on;
-axis square;% grid on;
-for i = 1:length(k2_vec)    
-    if range(i) == 1
-        plot(t,Cxdata(:,i), '-x', 'Markersize', 10, 'LineWidth', 3.5, ...
-            'Displayname', strcat(['k2 = ', num2str(k2_vec(i))]));
-    else
-    plot(t,Cxdata(:,i), 'LineWidth', 3.5, 'Displayname', strcat(['k2 = ', num2str(k2_vec(i))]));   
-    end
-end
-set(gca,'xtick',0:10:40); 
-xlabel('time [min]','FontSize',30,'Interpreter','Latex'); 
-ylabel('concentration $C_T$ [kBq/mL]','FontSize',30,'Interpreter','Latex');
-legend('show', 'Location','northeastoutside')
-ylim([0, 500])
-ax = gca;
-ax.XAxis.LineWidth = 2;
-ax.YAxis.LineWidth = 2;
-
-fig = gcf; fig.PaperPositionMode = 'auto';
-print(fullfile(path_figures, 'sensitivity_k2'),'-dpng','-r300')
-
-%% k3
-k1 = 0.3;
-k2 = 0.4;
-k3_vec = 0.6*range;
-k5= 0.6;
-k6 = 0.06;
-
-Cxdata = zeros(length(t),length(k3_vec));
-for i = 1:length(k3_vec)
-    k3 = k3_vec(i);
-    Mx = [[-(k2+k3);k3;0],[0;-k5;k5],[k6;0;-k6]];
-    Cx = concentration(k1,Mx,Ca,0,[0;0;0],t);
-    Cxdata(:,i) = (alpha*Cx + Vb*Ca(t))';
-end
-
-figure('units','normalized','outerposition',[0 0 0.7 0.7]);
-set(gcf,'Color','none');
-hold on;
-axis square;% grid on;
-for i = 1:length(k3_vec)    
-    if range(i) == 1
-        plot(t,Cxdata(:,i), '-x', 'Markersize', 10, 'LineWidth', 3.5, ...
-            'Displayname', strcat(['k3 = ', num2str(k3_vec(i))]));
-    else
-    plot(t,Cxdata(:,i), 'LineWidth', 3.5, 'Displayname', strcat(['k3 = ', num2str(k3_vec(i))]));   
-    end
-end
-set(gca,'xtick',0:10:40); 
-xlabel('time [min]','FontSize',30,'Interpreter','Latex'); 
-ylabel('concentration $C_T$ [kBq/mL]','FontSize',30,'Interpreter','Latex');
-legend('show', 'Location','northeastoutside')
-ylim([0, 500])
-ax = gca;
-ax.XAxis.LineWidth = 2;
-ax.YAxis.LineWidth = 2;
-
-fig = gcf; fig.PaperPositionMode = 'auto';
-print(fullfile(path_figures, 'sensitivity_k3'),'-dpng','-r300')
-
-%% k5 
-k1 = 0.3;
-k2 = 0.4;
-k3 = 0.6;
-k5_vec = 0.6*range;
-k6 = 0.06;
-
-Cxdata = zeros(length(t),length(k5_vec));
-for i = 1:length(k5_vec)
-    k5 = k5_vec(i);
-    Mx = [[-(k2+k3);k3;0],[0;-k5;k5],[k6;0;-k6]];
-    Cx = concentration(k1,Mx,Ca,0,[0;0;0],t);
-    Cxdata(:,i) = (alpha*Cx + Vb*Ca(t))';
-end
-
-figure('units','normalized','outerposition',[0 0 0.7 0.7]);
-set(gcf,'Color','none');
-hold on;
-axis square;% grid on;
-for i = 1:length(k5_vec)    
-       
-    if range(i) == 1
-        plot(t,Cxdata(:,i), '-x', 'Markersize', 10, 'LineWidth', 3.5, ...
-            'Displayname', strcat(['k5 = ', num2str(k5_vec(i))]));
-    else
-        plot(t,Cxdata(:,i), 'LineWidth', 3.5, 'Displayname', strcat(['k5 = ', num2str(k5_vec(i))]));
-    end
-end
-set(gca,'xtick',0:10:40); 
-xlabel('time [min]','FontSize',30,'Interpreter','Latex'); 
-ylabel('concentration $C_T$ [kBq/mL]','FontSize',30,'Interpreter','Latex');
-legend('show', 'Location','northeastoutside')
-ax = gca;
-ax.XAxis.LineWidth = 2;
-ax.YAxis.LineWidth = 2;
-ylim([0, 500])
-
-fig = gcf; fig.PaperPositionMode = 'auto';
-print(fullfile(path_figures, 'sensitivity_k5'),'-dpng','-r300')
-
-%% k6
-k1 = 0.3;
-k2 = 0.4;
-k3 = 0.6;
-k5= 0.6;
-k6_vec = 0.06*range;
-
-Cxdata = zeros(length(t),length(k6_vec));
-for i = 1:length(k6_vec)
-    k6 = k6_vec(i);
-    Mx = [[-(k2+k3);k3;0],[0;-k5;k5],[k6;0;-k6]];
-    Cx = concentration(k1,Mx,Ca,0,[0;0;0],t);
-    Cxdata(:,i) = (alpha*Cx + Vb*Ca(t))';
-end
-
-figure('units','normalized','outerposition',[0 0 0.7 0.7]);
-set(gcf,'Color','none');
-hold on;
-axis square;% grid on;
-for i = 1:length(k6_vec)    
-    if range(i) == 1
-        plot(t,Cxdata(:,i), '-x', 'Markersize', 10, 'LineWidth', 3.5, ...
-            'Displayname', strcat(['k6 = ', num2str(k6_vec(i))]));
-    else
-    plot(t,Cxdata(:,i), 'LineWidth', 3.5, 'Displayname', strcat(['k6 = ', num2str(k6_vec(i))]));   
-    end
-end
-set(gca,'xtick',0:10:40); 
-xlabel('time [min]','FontSize',30,'Interpreter','Latex'); 
-ylabel('concentration $C_T$ [kBq/mL]','FontSize',30,'Interpreter','Latex');
-legend('show', 'Location','northeastoutside')
-ylim([0, 500])
-ax = gca;
-ax.XAxis.LineWidth = 2;
-ax.YAxis.LineWidth = 2;
-
-fig = gcf; fig.PaperPositionMode = 'auto';
-print(fullfile(path_figures, 'sensitivity_k6'),'-dpng','-r300')
-
-%% Relative local sensitivity S_T
-k1_or = 0.3;   % Values of the parameters provided by the numerical 
-               % solution of the inverse problem.
-k2_or = 0.4;
-k3_or = 0.6;
-k5_or = 0.6;
-k6_or = 0.06;
 
 t0 = 0;         % Inital data for the compartment model
 C0 = [0; 0; 0];
 y0 = [0; 0; 0];
 
-n_par = 5;
-range = [0.01, 0.1, 0.5, 1, 1.1, 1.5, 1.6, 1.7, 2, 10, 20, 100, 1000];
+load(fullfile(path_data, 'data_m1.mat'));
+t = data.t'; Ca = data.Ca; clear data
+Ca = @(tt)(interp1([0 t],[0 Ca'],tt,'linear',0));
+
+%% Define reference values
+k1_true = 0.32; k2_true = 0.37; k3_true = 0.45; k5_true = 0.51; k6_true = 0.03; 
+    % Value estimated for mouse m1.
+Mx = [[-(k2_true+k3_true);k3_true;0],[0;-k5_true;k5_true],[k6_true;0;-k6_true]];
+Cx = concentration(k1_true,Mx,Ca,0,[0;0;0],t);
+CT_true = (alpha*Cx + Vb*Ca(t))';
+
+%% ********* Sensitivity analysis (one kinetic parameter at the time)
+range = logspace(-1, 2, 20);
+
+%% k1 
+k1_vec = k1_true*range;
+k2 = k2_true;
+k3 = k3_true;
+k5 = k5_true;
+k6 = k6_true;
+
+Cxdata = zeros(length(k1_vec), length(t));
+for i = 1:length(k1_vec)
+    k1 = k1_vec(i);
+    Mx = [[-(k2+k3);k3;0],[0;-k5;k5],[k6;0;-k6]];
+    Cx = concentration(k1,Mx,Ca,0,[0;0;0],t);
+    Cxdata(i,:) = (alpha*Cx + Vb*Ca(t))';
+end
+
+f_k1 = plot_3d_curves(t, k1_vec, Cxdata, [45, 15], 1, k1_true);
+hold on
+aux_t = [t'; t(end)];
+plot3(aux_t, k1_true*ones(size(aux_t)), [CT_true; 0], 'k.--', 'linewidth', 4)
+f_k1.PaperPositionMode = 'auto';
+print(fullfile(path_figures, 'sensitivity_3D_k1'),'-dpng','-r300')
+
+%% k2
+k1 = k1_true;
+k2_vec = k2_true*range;
+k3 = k3_true;
+k5 = k5_true;
+k6 = k6_true;
+
+Cxdata = zeros(length(k2_vec), length(t));
+for i = 1:length(k2_vec)
+    k2 = k2_vec(i);
+    Mx = [[-(k2+k3);k3;0],[0;-k5;k5],[k6;0;-k6]];
+    Cx = concentration(k1,Mx,Ca,0,[0;0;0],t);
+    Cxdata(i,:) = (alpha*Cx + Vb*Ca(t))';
+end
+
+f_k2 = plot_3d_curves(t, k2_vec, Cxdata, [145, 15], 2, k2_true);
+hold on
+aux_t = [t'; t(end)];
+plot3(aux_t, k2_true*ones(size(aux_t)), [CT_true; 0], 'k.--', 'linewidth', 4)
+f_k2.PaperPositionMode = 'auto';
+print(fullfile(path_figures, 'sensitivity_3D_k2'),'-dpng','-r300')
+
+%% k3
+k1 = k1_true;
+k2 = k2_true;
+k3_vec = k3_true*range;
+k5= k5_true;
+k6 = k6_true;
+
+Cxdata = zeros(length(k3_vec), length(t));
+for i = 1:length(k3_vec)
+    k3 = k3_vec(i);
+    Mx = [[-(k2+k3);k3;0],[0;-k5;k5],[k6;0;-k6]];
+    Cx = concentration(k1,Mx,Ca,0,[0;0;0],t);
+    Cxdata(i,:) = (alpha*Cx + Vb*Ca(t))';
+end
+
+f_k3 = plot_3d_curves(t, k3_vec, Cxdata, [45, 15], 3, k3_true);
+hold on
+aux_t = [t'; t(end)];
+plot3(aux_t, k3_true*ones(size(aux_t)), [CT_true; 0], 'k.--', 'linewidth', 4)
+f_k3.PaperPositionMode = 'auto';
+print(fullfile(path_figures, 'sensitivity_3D_k3'),'-dpng','-r300')
+
+%% k5 
+k1 = k1_true;
+k2 = k2_true;
+k3 = k3_true;
+k5_vec = k5_true*range;
+k6 = k6_true;
+
+Cxdata = zeros(length(k5_vec), length(t));
+for i = 1:length(k5_vec)
+    k5 = k5_vec(i);
+    Mx = [[-(k2+k3);k3;0],[0;-k5;k5],[k6;0;-k6]];
+    Cx = concentration(k1,Mx,Ca,0,[0;0;0],t);
+    Cxdata(i,:) = (alpha*Cx + Vb*Ca(t))';
+end
+
+f_k5 = plot_3d_curves(t, k5_vec, Cxdata, [145, 15], 5, k5_true);
+hold on
+aux_t = [t'; t(end)];
+plot3(aux_t, k5_true*ones(size(aux_t)), [CT_true; 0], 'k.--', 'linewidth', 4)
+f_k5.PaperPositionMode = 'auto';
+print(fullfile(path_figures, 'sensitivity_3D_k5'),'-dpng','-r300')
+
+%% k6
+k1 = k1_true;
+k2 = k2_true;
+k3 = k3_true;
+k5 = k5_true;
+k6_vec = k6_true*range;
+
+Cxdata = zeros(length(k6_vec), length(t));
+for i = 1:length(k6_vec)
+    k6 = k6_vec(i);
+    Mx = [[-(k2+k3);k3;0],[0;-k5;k5],[k6;0;-k6]];
+    Cx = concentration(k1,Mx,Ca,0,[0;0;0],t);
+    Cxdata(i,:) = (alpha*Cx + Vb*Ca(t))';
+end
+
+f_k6 = plot_3d_curves(t, k6_vec, Cxdata, [45, 15], 6, k6_true);
+hold on
+aux_t = [t'; t(end)];
+plot3(aux_t, k6_true*ones(size(aux_t)), [CT_true; 0], 'k.--', 'linewidth', 4)
+f_k6.PaperPositionMode = 'auto';
+print(fullfile(path_figures, 'sensitivity_3D_k6'),'-dpng','-r300')
+
+%% ********* Relative local sensitivity S_T
+% Initialization
+range = logspace(-3, 3, 20);
 n_scaling_factor = numel(range);
+n_par = 5;
 
 S_T = zeros(n_par, n_scaling_factor);
 
+t = t';
+
 %% k1
-k2 = k2_or; k3 = k3_or; k5 = k5_or; k6 = k6_or;
+k2 = k2_true; k3 = k3_true; k5 = k5_true; k6 = k6_true;
 for is = 1:n_scaling_factor
-    k1 = k1_or*range(is);
+    k1 = k1_true*range(is);
 
     A_coeff = [ [-(k2+k3); k3; 0], [0; -k5; k5], [k6; 0; -k6]];
     
-    C_time = f_comp_sol_activity(A_coeff, k1*Ca(t)', [1; 0; 0], t0, C0, t);
+    C_time = f_comp_sol_activity(A_coeff, k1*Ca(t), [1; 0; 0], t0, C0, t);
     CT_time = (alpha * C_time + Vb * Ca(t) );
     
-    y_k1 = f_comp_sol_activity(A_coeff, Ca(t)', [1; 0; 0], t0, y0, t);
+    y_k1 = f_comp_sol_activity(A_coeff, Ca(t), [1; 0; 0], t0, y0, t);
     ST_C_k1 = k1 * (y_k1 ./ C_time);
     
     CT_dk1 = alpha * y_k1;
@@ -269,13 +182,13 @@ end
 clear k1 k2 k3 k5 k6
 
 %% k2
-k1 = k1_or; k3 = k3_or; k5 = k5_or; k6 = k6_or;
+k1 = k1_true; k3 = k3_true; k5 = k5_true; k6 = k6_true;
 for is = 1:n_scaling_factor
-    k2 = k2_or*range(is);
+    k2 = k2_true*range(is);
 
     A_coeff = [ [-(k2+k3); k3; 0], [0; -k5; k5], [k6; 0; -k6]];
     
-    C_time = f_comp_sol_activity(A_coeff, k1*Ca(t)', [1; 0; 0], t0, C0, t);
+    C_time = f_comp_sol_activity(A_coeff, k1*Ca(t), [1; 0; 0], t0, C0, t);
     CT_time = (alpha * C_time + Vb * Ca(t) );
     
     y_k2 = f_comp_sol_activity(A_coeff, -C_time(1, :)', [1; 0; 0], t0, y0, t);
@@ -291,13 +204,13 @@ end
 clear k1 k2 k3 k5 k6
 
 %% k3 
-k1 = k1_or; k2 = k2_or; k5 = k5_or; k6 = k6_or;
+k1 = k1_true; k2 = k2_true; k5 = k5_true; k6 = k6_true;
 for is = 1:n_scaling_factor
-    k3 = k3_or*range(is);
+    k3 = k3_true*range(is);
 
     A_coeff = [ [-(k2+k3); k3; 0], [0; -k5; k5], [k6; 0; -k6]];
     
-    C_time = f_comp_sol_activity(A_coeff, k1*Ca(t)', [1; 0; 0], t0, C0, t);
+    C_time = f_comp_sol_activity(A_coeff, k1*Ca(t), [1; 0; 0], t0, C0, t);
     CT_time = (alpha * C_time + Vb * Ca(t) );
     
     y_k3 = f_comp_sol_activity(A_coeff, -C_time(1, :)', [1; 0; 0], t0, y0, t) + ...
@@ -314,13 +227,13 @@ end
 clear k1 k2 k3 k5 k6
 
 %% k5
-k1 = k1_or; k2 = k2_or; k3 = k3_or; k6 = k6_or;
+k1 = k1_true; k2 = k2_true; k3 = k3_true; k6 = k6_true;
 for is = 1:n_scaling_factor
-    k5 = k5_or*range(is);
+    k5 = k5_true*range(is);
 
     A_coeff = [ [-(k2+k3); k3; 0], [0; -k5; k5], [k6; 0; -k6]];
     
-    C_time = f_comp_sol_activity(A_coeff, k1*Ca(t)', [1; 0; 0], t0, C0, t);
+    C_time = f_comp_sol_activity(A_coeff, k1*Ca(t), [1; 0; 0], t0, C0, t);
     CT_time = (alpha * C_time + Vb * Ca(t) );
     
     y_k5 = f_comp_sol_activity(A_coeff, -C_time(2, :)', [0; 1; 0], t0, y0, t) + ...
@@ -337,13 +250,13 @@ end
 clear k1 k2 k3 k5 k6
 
 %% k6
-k1 = k1_or; k2 = k2_or; k3 = k3_or; k5 = k5_or;
+k1 = k1_true; k2 = k2_true; k3 = k3_true; k5 = k5_true;
 for is = 1:n_scaling_factor
-    k6 = k6_or*range(is);
+    k6 = k6_true*range(is);
 
     A_coeff = [ [-(k2+k3); k3; 0], [0; -k5; k5], [k6; 0; -k6]];
     
-    C_time = f_comp_sol_activity(A_coeff, k1*Ca(t)', [1; 0; 0], t0, C0, t);
+    C_time = f_comp_sol_activity(A_coeff, k1*Ca(t), [1; 0; 0], t0, C0, t);
     CT_time = (alpha * C_time + Vb * Ca(t) );
     
     y_k6 = f_comp_sol_activity(A_coeff, -C_time(3, :)', [1; 0; 0], t0, y0, t) + ...
@@ -361,6 +274,7 @@ clear k1 k2 k3 k5 k6
 
 %% Plot results
 figure('units','normalized','outerposition',[0 0 0.5 0.7]);
+set(gcf,'Color','none');
 hold on
 plot(range, S_T(1, :), 'Linewidth', 3, 'Displayname',  '$\overline{S}_T^1$')
 plot(range, S_T(2, :), 'Linewidth', 3, 'Displayname',  '$\overline{S}_T^2$')
@@ -370,7 +284,7 @@ plot(range, S_T(5, :), 'Linewidth', 3, 'Displayname',  '$\overline{S}_T^6$')
 lgd = legend('show', 'Location', 'Bestoutside');
 lgd.FontSize = 25;
 set(lgd, 'Interpreter', 'Latex');
-set(gca, 'XScale', 'log', 'FontSize', 25);
+set(gca, 'XScale', 'log', 'FontSize', 25, 'Xtick', [0.001, 0.01, 0.1, 1, 10, 100, 1000]);
 ax = gca;
 ax.XAxis.LineWidth = 2;
 ax.YAxis.LineWidth = 2;
@@ -379,8 +293,30 @@ xlabel('Scaling factor', 'FontSize', 25, 'Interpreter', 'Latex')
 axis tight
 print(fullfile(path_figures, 'ST_all_parameters'), '-dpng','-r300')
 
+%% Auxiliary function for 3D plots
+function f1 = plot_3d_curves(time, k_j_vec, Cxdata, view_par, idx_k, k_j_true)
 
+    f1 = figure('units','normalized','outerposition',[0 0 0.5 0.7]);
+    set(gcf,'Color','none');
+    
+    [aux_X, aux_Y] = meshgrid(time, k_j_vec);
+    h = waterfall(aux_X, aux_Y, Cxdata);
+    set(h, 'LineWidth', 4 );
+    hidden off;
+    view(view_par)
+    zlim([0, 700])
+    ylim([k_j_vec(1), k_j_vec(end)])
+    aux_ytick = [k_j_vec(1), k_j_true, k_j_vec(end)];
+    set(gca, 'yscale', 'log', 'ytick', aux_ytick)
+    xlabel('Time [min]')
+    ylabel(sprintf('$k_%d$', idx_k), 'Interpreter', 'latex')
+    zlabel('concentration $C_T$ [kBq/mL]', 'Interpreter', 'latex')
 
+    CD = get (h, 'CData');
+    CD(end-2:end,:) = nan;
+    set (h, 'CData', CD)
+    
+end
 
 
 

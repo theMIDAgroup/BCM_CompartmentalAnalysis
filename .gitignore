@@ -1,0 +1,12 @@
+# Original data and related code
+data_original/
+script_read_curves.m
+
+# Results in the submitted version of the paper
+results_submitted/
+
+# Figures assembled for the paper
+figures_complete/
+
+# code work in progress
+work_in_progress

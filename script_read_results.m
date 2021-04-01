@@ -2,6 +2,9 @@ clc
 clear 
 close all
 
+%% Read results and generate Table 2 and Table 3 (estimated values of the
+%  kinetic parameters.
+
 path_results = './results';
 
 n_mice =6;
